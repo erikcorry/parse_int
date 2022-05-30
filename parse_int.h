@@ -306,14 +306,14 @@ inline _WORD _POWERS_OF_10(_WORD exponent) {
         1000000ULL,  // 6
         10000000ULL,  // 7
         100000000ULL,  // 8
-        1000000000ULL,  // 9
-        10000000000ULL,  // 10
-        100000000000ULL,  // 11
-        1000000000000ULL,  // 12
-        10000000000000ULL,  // 13
-        100000000000000ULL,  // 14
-        1000000000000000ULL,  // 15
-        10000000000000000ULL,  // 16
+        sizeof(size_t) == 4 ? 0 : 1000000000ULL,  // 9
+        sizeof(size_t) == 4 ? 0 : 10000000000ULL,  // 10
+        sizeof(size_t) == 4 ? 0 : 100000000000ULL,  // 11
+        sizeof(size_t) == 4 ? 0 : 1000000000000ULL,  // 12
+        sizeof(size_t) == 4 ? 0 : 10000000000000ULL,  // 13
+        sizeof(size_t) == 4 ? 0 : 100000000000000ULL,  // 14
+        sizeof(size_t) == 4 ? 0 : 1000000000000000ULL,  // 15
+        sizeof(size_t) == 4 ? 0 : 10000000000000000ULL,  // 16
   };
   return powers[exponent];
 }
