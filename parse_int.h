@@ -292,7 +292,7 @@ inline _WORD _CALCULATE_BASE_10(_CHUNK bytes) {
 
 #endif
 
-#define _MAX_DIGITS(type) (sizeof(type) == 4 ? 10 : (sizeof(type) == 8 ? 20 : 39))
+#define _MAX_DIGITS(type, is_unsigned) (sizeof(type) == 4 ? 10 : (sizeof(type) == 8 ? (is_unsigned ? 20 : 19) : 39))
 
 _WORD _POWERS_OF_10(_WORD exponent);
 inline _WORD _POWERS_OF_10(_WORD exponent) {
@@ -330,9 +330,11 @@ const char *name##_##width declare_args;                                     \
 inline const char *name##_##width declare_args {                             \
   declare_locals                                                             \
   _DEFINE_STATIC_CONSTS;                                                     \
-  if (check_overflow && has_size && end - p < _MAX_DIGITS(type)) {           \
-    if (check_input) return parse_nooverflow_##width(result, p, end - p);    \
-    return parse_nocheck_##width(result, p, end - p);                        \
+  if (check_overflow && has_size) {                                          \
+    if (end - p < _MAX_DIGITS(type, is_unsigned)) {                          \
+      if (check_input) return parse_nooverflow_##width(result, p, end - p);  \
+      return parse_nocheck_##width(result, p, end - p);                      \
+    }                                                                        \
   }                                                                          \
   if (has_size && _UNLIKELY(end <= p)) return NULL;                          \
   if (is_null_terminated && _UNLIKELY(!*p)) return NULL;                     \
@@ -409,7 +411,7 @@ inline const char *name##_##width declare_args {                             \
     }                                                                        \
     if (p >= end) {                                                          \
       if (check_overflow) {                                                  \
-        if (_UNLIKELY(end - digits_start > _MAX_DIGITS(utype))) {            \
+        if (_UNLIKELY(end - digits_start > _MAX_DIGITS(utype, is_unsigned))) {            \
           /* We may have an overflow.  We need to check how many leading  */ \
           /* zeros there were to be sure.  This path is not very          */ \
           /* optimized - normally we don't have overflows or large        */ \
@@ -417,13 +419,16 @@ inline const char *name##_##width declare_args {                             \
           for (; digits_start < end; digits_start++) {                       \
             if (*digits_start != '0') break;                                 \
           }                                                                  \
-          if (_UNLIKELY(end - digits_start > _MAX_DIGITS(utype))) {          \
+          if (_UNLIKELY(end - digits_start >                                 \
+                        _MAX_DIGITS(utype, is_unsigned))) {                  \
             return NULL;                                                     \
           }                                                                  \
         }                                                                    \
       }                                                                      \
-      if (is_unsigned || !check_overflow) {                                  \
+      if (is_unsigned) {                                                     \
         *result = (type)r;                                                   \
+      } else if (!check_overflow) {                                          \
+        *result = negative ? -r : r;                                         \
       } else {                                                               \
         utype max = 0;                                                       \
         max = (max - 1) >> 1;                                                \
