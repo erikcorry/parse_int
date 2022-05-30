@@ -4,8 +4,8 @@ Various routines for parsing integers.  The integers can be assumed to be
 null terminated or terminated with non-integer characters.  Alternatively
 you can pass an explicit string size.
 
-It's about 40% faster than standard `strtoull` on a modern Linux (runs
-in only 60% of the time).
+Apart from the more flexible API, it's about 40% faster than standard
+`strtoull` on a modern Linux (runs in only 60% of the time).
 
 ParseInt uses SIMD methods to process many digits at a time.  There are
 SSE2 versions and versions using plain 64 bit values.  Currently the
