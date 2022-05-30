@@ -41,9 +41,13 @@ int main() {
   unsigned long long sum = 0;
   for (int i = 0; i < 10000000; i++) {
     for (int j = 0; j < 152; j++) {
+#ifdef USE_STRTOL
+      char* end;
+      unsigned long long x = strtoull(VECTORS[j], &end, 10);
+#else
       long long x = 0;
       parse_long_long(&x, VECTORS[j]);
-      //unsigned long long x = strtoull(VECTORS[j], &end, 10);
+#endif
       sum += x;
     }
   }
